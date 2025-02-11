@@ -4,7 +4,7 @@
 SCRIPT_DIR=$(dirname $(realpath $0))
 
 # Diretório src do projeto
-SRC_DIR="${SCRIPT_DIR}/flappy-bird-main"
+SRC_DIR="${SCRIPT_DIR}/flappyBirdMain"
 
 # Configurar PYTHONPATH para incluir o diretório src do projeto
 export PYTHONPATH="${SRC_DIR}:${PYTHONPATH}"

@@ -6,9 +6,19 @@ audios = {}
 
 
 def load_sprites():
-    path = os.path.join("assets", "sprites")
-    for file in os.listdir(path):
-        sprites[file.split('.')[0]] = pygame.image.load(os.path.join(path, file))
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    sprites_path = os.path.join(base_path, 'assets', 'sprites')
+    
+    if not os.path.exists(sprites_path):
+        raise FileNotFoundError(f"Diretório não encontrado: {sprites_path}")
+    
+    sprites = {}
+    for file in os.listdir(sprites_path):
+        if file.endswith('.png'):
+            sprite_name = os.path.splitext(file)[0]
+            sprites[sprite_name] = pygame.image.load(os.path.join(sprites_path, file))
+    
+    return sprites
 
 
 def get_sprite(name):
@@ -16,9 +26,19 @@ def get_sprite(name):
 
 
 def load_audios():
-    path = os.path.join("assets", "audios")
-    for file in os.listdir(path):
-        audios[file.split('.')[0]] = pygame.mixer.Sound(os.path.join(path, file))
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    audios_path = os.path.join(base_path, 'assets', 'audios')
+    
+    if not os.path.exists(audios_path):
+        raise FileNotFoundError(f"Diretório não encontrado: {audios_path}")
+    
+    audios = {}
+    for file in os.listdir(audios_path):
+        if file.endswith('.wav') or file.endswith('.mp3'):
+            audio_name = os.path.splitext(file)[0]
+            audios[audio_name] = pygame.mixer.Sound(os.path.join(audios_path, file))
+    
+    return audios
 
 
 def play_audio(name):

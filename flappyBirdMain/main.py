@@ -20,8 +20,15 @@ pygame.init()
 screen = pygame.display.set_mode((configs.SCREEN_WIDTH, configs.SCREEN_HEIGHT))
 pygame.display.set_caption("Flappy Bird Game v1.0.2")
 
-img = pygame.image.load('assets/icons/red_bird.png')
+base_path = os.path.dirname(os.path.abspath(__file__))
+icon_path = os.path.join(base_path, 'assets', 'icons', 'red_bird.png')
+img = pygame.image.load(icon_path)
 pygame.display.set_icon(img)
+
+sprites_path = os.path.join(base_path, 'assets', 'sprites')
+
+assets.load_sprites()
+
 
 
 clock = pygame.time.Clock()

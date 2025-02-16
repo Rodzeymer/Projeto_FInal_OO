@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 import pygame
 import asyncio
 import websockets
@@ -18,6 +22,7 @@ pygame.display.set_caption("Flappy Bird Game v1.0.2")
 
 img = pygame.image.load('assets/icons/red_bird.png')
 pygame.display.set_icon(img)
+
 
 clock = pygame.time.Clock()
 column_create_event = pygame.USEREVENT

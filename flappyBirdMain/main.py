@@ -120,86 +120,86 @@ async def login(username, password):
 async def logout():
     response = await send_message("logout:")
     return "logout_success" in response
+while True:
+    async def main():
+        global running, gameover, gamestarted, logged_in, current_user
 
-async def main():
-    global running, gameover, gamestarted, logged_in, current_user
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
 
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+                # Verifica se o usuário está logado antes de permitir interações com o jogo
+                if not logged_in:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_r:  # Registro
+                            username = input("Digite um nome de usuário: ")
+                            password = input("Digite uma senha: ")
+                            if await register(username, password):
+                                print("Registro bem-sucedido!")
+                            else:
+                                print("Falha no registro.")
 
-            # Verifica se o usuário está logado antes de permitir interações com o jogo
-            if not logged_in:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_r:  # Registro
-                        username = input("Digite um nome de usuário: ")
-                        password = input("Digite uma senha: ")
-                        if await register(username, password):
-                            print("Registro bem-sucedido!")
-                        else:
-                            print("Falha no registro.")
+                        elif event.key == pygame.K_l:  # Login
+                            username = input("Digite seu nome de usuário: ")
+                            password = input("Digite sua senha: ")
+                            if await login(username, password):
+                                logged_in = True
+                                current_user = username
+                                print(f"Login bem-sucedido! Bem-vindo, {username}!")
+                            else:
+                                print("Falha no login.")
+                else:
+                    # Lógica do jogo (apenas se o usuário estiver logado)
+                    if event.type == column_create_event:
+                        Column(sprites)
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE and not gamestarted and not gameover:
+                            gamestarted = True
+                            game_start_message.kill()
+                            pygame.time.set_timer(column_create_event, 1500)
+                        if event.key == pygame.K_ESCAPE and gameover:
+                            gameover = False
+                            gamestarted = False
+                            sprites.empty()
+                            bird, game_start_message, score = create_sprites()
+                        if event.key == pygame.K_o:  # Logout
+                            if await logout():
+                                logged_in = False
+                                current_user = None
+                                print("Logout bem-sucedido!")
 
-                    elif event.key == pygame.K_l:  # Login
-                        username = input("Digite seu nome de usuário: ")
-                        password = input("Digite sua senha: ")
-                        if await login(username, password):
-                            logged_in = True
-                            current_user = username
-                            print(f"Login bem-sucedido! Bem-vindo, {username}!")
-                        else:
-                            print("Falha no login.")
-            else:
-                # Lógica do jogo (apenas se o usuário estiver logado)
-                if event.type == column_create_event:
-                    Column(sprites)
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE and not gamestarted and not gameover:
-                        gamestarted = True
-                        game_start_message.kill()
-                        pygame.time.set_timer(column_create_event, 1500)
-                    if event.key == pygame.K_ESCAPE and gameover:
-                        gameover = False
-                        gamestarted = False
-                        sprites.empty()
-                        bird, game_start_message, score = create_sprites()
-                    if event.key == pygame.K_o:  # Logout
-                        if await logout():
-                            logged_in = False
-                            current_user = None
-                            print("Logout bem-sucedido!")
+                # Manipulação de eventos do jogo (apenas se o usuário estiver logado e o jogo não estiver em gameover)
+                if not gameover and logged_in:
+                    bird.handle_event(event)
 
-            # Manipulação de eventos do jogo (apenas se o usuário estiver logado e o jogo não estiver em gameover)
-            if not gameover and logged_in:
-                bird.handle_event(event)
+            # Desenha os sprites na tela
+            screen.fill(0)
+            sprites.draw(screen)
 
-        # Desenha os sprites na tela
-        screen.fill(0)
-        sprites.draw(screen)
+            # Atualiza os sprites (apenas se o jogo estiver em andamento)
+            if gamestarted and not gameover:
+                sprites.update()
 
-        # Atualiza os sprites (apenas se o jogo estiver em andamento)
-        if gamestarted and not gameover:
-            sprites.update()
+            # Verifica colisões
+            if bird.check_collision(sprites) and not gameover:
+                gameover = True
+                gamestarted = False
+                GameOverMessage(sprites)
+                pygame.time.set_timer(column_create_event, 0)
+                assets.play_audio("hit")
 
-        # Verifica colisões
-        if bird.check_collision(sprites) and not gameover:
-            gameover = True
-            gamestarted = False
-            GameOverMessage(sprites)
-            pygame.time.set_timer(column_create_event, 0)
-            assets.play_audio("hit")
+            # Atualiza a pontuação
+            for sprite in sprites:
+                if type(sprite) is Column and sprite.is_passed():
+                    score.value += 1
+                    assets.play_audio("point")
 
-        # Atualiza a pontuação
-        for sprite in sprites:
-            if type(sprite) is Column and sprite.is_passed():
-                score.value += 1
-                assets.play_audio("point")
+            # Atualiza a tela
+            pygame.display.flip()
+            clock.tick(configs.FPS)
 
-        # Atualiza a tela
-        pygame.display.flip()
-        clock.tick(configs.FPS)
-
-    pygame.quit()
+        pygame.quit()
 
 # Executa o loop principal do jogo com suporte a async/await
-asyncio.run(main())
+    asyncio.run(main())

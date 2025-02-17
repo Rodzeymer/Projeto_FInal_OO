@@ -187,13 +187,13 @@ while True:
                 gamestarted = False
                 GameOverMessage(sprites)
                 pygame.time.set_timer(column_create_event, 0)
-                assets.play_audio("hit")
+                assets.play_audio("hit.wav")
 
             # Atualiza a pontuação
             for sprite in sprites:
                 if type(sprite) is Column and sprite.is_passed():
                     score.value += 1
-                    assets.play_audio("point")
+                    assets.play_audio("point.wav")
 
             # Atualiza a tela
             pygame.display.flip()
